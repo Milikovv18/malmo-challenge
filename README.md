@@ -1,112 +1,132 @@
-# The Malmo Collaborative AI Challenge
+# 🤖 QLearning for malmo-challenge
 
-This repository contains the task definition and example code for the [Malmo Collaborative AI Challenge](https://www.microsoft.com/en-us/research/academic-program/collaborative-ai-challenge/).
-This challenge is organized to encourage research in collaborative AI - to work towards AI agents 
-that learn to collaborate to solve problems and achieve goals. 
-You can find additional details, including terms and conditions, prizes and information on how to participate at the [Challenge Homepage](https://www.microsoft.com/en-us/research/academic-program/collaborative-ai-challenge/).
+<img src="https://github.com/user-attachments/assets/d24f4da6-06aa-43e6-b48c-33fc66fc3138" align="right" width=180/>
 
-[![Join the chat at https://gitter.im/malmo-challenge/Lobby](https://badges.gitter.im/malmo-challenge/Lobby.svg)](https://gitter.im/malmo-challenge/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/Microsoft/malmo-challenge/blob/master/LICENSE)
+![Minecraft](https://img.shields.io/badge/Minecraft-green?logo=anycubic&logoColor=gray)
+![AI](https://img.shields.io/badge/QLearning-orange?logo=tensorflow&logoColor=white)
 
-----
+This project, completed as a Bachelor's thesis, addresses a solution for the [Microsoft Malmo Collaborative AI Challenge](https://github.com/microsoft/malmo-challenge).
 
-**Notes for challenge participants:** Once you and your team decide to participate in the challenge, please make sure to register your team at our [Registration Page](https://www.surveygizmo.com/s3/3299773/The-Collaborative-AI-Challenge). On the registration form, you need to provide a link to the GitHub repository that will 
-contain your solution. We recommend that you fork this repository (<a href="https://help.github.com/articles/fork-a-repo/" target="_blank">learn how</a>), 
-and provide address of the forked repo. You can then update your submission as you make progress on the challenge task. 
-We will consider the version of the code on branch master at the time of the submission deadline as your challenge submission. Your submission needs to contain code in working order, a 1-page description of your approach, and a 1-minute video that shows off your agent. Please see the [challenge terms and conditions]() for further details.
+The research aims to develop collaborative strategies for AI agents to recognize the intentions of teammates and achieve shared goals.
 
-----
+The solution is divided into two stages: a simplified 2D simulation environment and adaptation to the complex 3D game environment of Minecraft.
 
-**Jump to:**
+---
 
-- [Installation](#installation)
-  - [Prerequisites](#prerequisites)
-  - [Minimal installation](#minimal-installation)
-  - [Optional extensions](#optional-extensions)
+## 🌐 Simplified 2D Simulation
 
-- [Getting started](#getting-started)
-  - [Play the challenge task](#play-the-challenge-task)
-  - [Run your first experiment](#run-your-first-experiment)
+### Overview
+The 2D simulation simplifies the problem by discretizing the environment into a grid-based layout. The agents navigate this grid to achieve specific objectives while avoiding obstacles. This step aims to efficiently train and test fundamental behaviors before transitioning to the more complex 3D environment.
+Code for this stage can be found in [QLearning2D](QLearning2D) directory.
 
-- [Next steps](#next-steps)
-  - [Run an experiment in Docker on Azure](#run-an-experiment-in-docker-on-azure)
-  - [Compare your results again other teams](#compare-your-results-against-other-teams)
-  - [Resources](#resources)
+### Environment Representation
 
-# Installation
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9e540171-c6e4-4379-9625-77b31adbb0fe" />
+</p>
 
-## Prerequisites
+- **Grid Layout**: The environment is a 10x10 grid with obstacles, agents, and a movable target.
+- **Actions**: The agents can move up, down, left, or right, constrained by obstacles and grid boundaries.
 
-- [Python](https://www.python.org/) 2.7+ (recommended) or 3.5+
-- [Project Malmo](https://github.com/Microsoft/malmo) - we recommend downloading the [Malmo-0.21.0 release](https://github.com/Microsoft/malmo/releases) and installing dependencies for [Windows](https://github.com/Microsoft/malmo/blob/master/doc/install_windows.md), [Linux](https://github.com/Microsoft/malmo/blob/master/doc/install_linux.md) or [MacOS](https://github.com/Microsoft/malmo/blob/master/doc/install_macosx.md). Test your Malmo installation by [launching Minecraft with Malmo](https://github.com/Microsoft/malmo#launching-minecraft-with-our-mod) and [launching an agent](https://github.com/Microsoft/malmo#launch-an-agent).
+### Methodology
+The core algorithm for training is Q-Learning, which updates the agent's knowledge through reward-based interactions with the environment. The Q-table captures the expected utility of actions for each state, which is updated using the Bellman equation:
 
-## Minimal installation
+$$ Q(s, a) \leftarrow Q(s, a) + \alpha \left[ r + \gamma \max_a Q(s', a) - Q(s, a) \right] $$
 
-```
-pip install -e git+https://github.com/Microsoft/malmo-challenge#egg=malmopy
-```
+Where:
+- $\ Q(s, a) $: The current value of state-action pair
+- $\ \alpha $: Learning rate
+- $\ \gamma $: Discount factor
+- $\ r $: Immediate reward
+- $\ s' $: Next state
 
-or 
+### Results
+1. **Behavior Demonstration**:
 
-```
-git clone https://github.com/Microsoft/malmo-challenge
-cd malmo-challenge
-pip install -e .
-```
-
-## Optional extensions
-
-Some of the example code uses additional dependencies to provide 'extra' functionality. These can be installed using:
-
-```
-pip install -e '.[extra1, extra2]'
-```
-For example to install gym and chainer:
-
-```
-pip install -e '.[gym]'
-```
-
-Or to install all extras:
-
-```
-pip install -e '.[all]'
-```
-
-The following extras are available:
-- `gym`: [OpenAI Gym](https://gym.openai.com/) is an interface to a wide range of reinforcement learning environments. Installing this extra enables the Atari example agents in [samples/atari](samples/atari) to train on the gym environments. *Note that OpenAI gym atari environments are currently not available on Windows.*
-- `tensorflow`: [TensorFlow](https://www.tensorflow.org/) is a popular deep learning framework developed by Google. In our examples it enables visualizations through [TensorBoard](https://www.tensorflow.org/get_started/summaries_and_tensorboard).
+| ![Collaborative](https://github.com/user-attachments/assets/bf6dd7fe-46bb-45dd-bc33-937226779a97) | ![Random](https://github.com/user-attachments/assets/dd1a052c-c1c1-4c2b-8335-50e5458c2f10) | 
+|:--:| :--: | 
+| *Collaborative behavior* | *Random behavior* |
 
 
-# Getting started
+2. **Metrics**:
 
-## Play the challenge task
+   - **Average Distance between agents and the goal** (orange - random behavior, blue - collaborative behavior):
 
-The challenge task takes the form of a mini game, called Pig Chase. Learn about the game, and try playing it yourself on our [Pig Chase Challenge page](ai_challenge/pig_chase/README.md).
+      <p align="left">
+        <img src="https://github.com/user-attachments/assets/4fc5cad4-0a2c-49e2-a073-5258ba8cf002" width="500"/>
+      </p>
 
-## Run your first experiment
+   - **Game Outcomes**: Average game score for every step number:
 
-See how to [run your first baseline experiment](ai_challenge/pig_chase/README.md#run-your-first-experiment) on the [Pig Chase Challenge page](ai_challenge/pig_chase/README.md).
+      <p align="left">
+        <img src="https://github.com/user-attachments/assets/825c2f8b-6372-4e1d-bc4e-6e5c4cab94b9" width="500"/>
+      </p>
 
-# Next steps
+4. **Cycle Detection**:
+   Fourier analysis was used to identify cyclic behaviors, helping optimize agent policies:
 
-## Run an experiment in Docker on Azure
+      <p align="left">
+        <img src="https://github.com/user-attachments/assets/fcd2e712-6ae8-4da6-aa6a-0c5ac95572ad" width="500"/>
+      </p>
 
-Docker is a virtualization platform that makes it easy to deploy software with all its dependencies. 
-We use docker to run experiments locally or in the cloud. Details on how to run an example experiment using docker are in the [docker README](docker/README.md).
+---
 
-## Compare your results against other teams:
+## 🌎 Adaptation to the Minecraft Environment
 
-We provide you a [leaderboard website](https://malmo-leaderboard.azurewebsites.net/) where you can compare your results against the other participants.
+### Overview
+The 3D environment introduces a dynamic, continuous space with additional challenges, such as real-time movements and collisions. The target application is the "Pig Chase" mini-game, where agents collaborate to capture a pig while navigating obstacles.
 
+### Environment Representation
+- **Game Features**:
+  - Agents interact in real-time.
+  - Obstacles and boundaries create a sparse maze.
+  - Goals and obstacles are dynamically positioned.
 
-## Resources
+### Methodology
+Adapting the trained 2D models required enhancing the Q-learning framework to accommodate:
+- Continuous state space representation.
+- Real-time interaction with Minecraft's physics and object constraints.
 
-- [Malmo Platform Tutorial](https://github.com/Microsoft/malmo/blob/master/Malmo/samples/Python_examples/Tutorial.pdf)
-- [Azure Portal](portal.azure.com/)
-- [Docker Documentation](https://docs.docker.com/)
-- [Docker Machine on Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-docker-machine)
-- [CNTK Tutorials](https://www.microsoft.com/en-us/research/product/cognitive-toolkit/tutorials/)
-- [CNTK Documentation](https://github.com/Microsoft/CNTK/wiki)
-- [Chainer Documentation](http://docs.chainer.org/en/stable/)
-- [TensorBoard Documentation](https://www.tensorflow.org/get_started/summaries_and_tensorboard)
+The agent's decision-making process relies on a modified version of the Q-table that accounts for:
+- Distance to the target.
+- Interaction with dynamic obstacles.
+- Recognition of teammate behavior.
+
+### Results
+1. **Behavior Demonstration in 3D**:
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3a687f4e-eed9-4f6a-97d6-088ea758779e" width="500"/>
+</p>
+
+2. **Success Rates**:
+The collaborative strategies from the 2D environment achieved an approximate 90% accuracy in recognizing teammate intentions and completing tasks.
+
+### Challenges
+- **Collision Handling**: Modifications to the Minecraft environment were required to disable collisions, improving agent pathfinding in dynamic setups.
+- **Dynamic Obstacles**: Agents adapted well but showed minor inefficiencies in complex scenarios, which can be improved with further refinements.
+
+---
+
+## Conclusion
+This project demonstrates the effectiveness of combining simplified environments for initial training with adaptations for more complex, realistic setups. The achieved models provide a robust foundation for multiagent collaboration with minimal communication.
+
+---
+
+## References
+- [John McCarthy. What is artificial intelligence? (2007)](https://www-formal.stanford.edu/jmc/whatisai.pdf)
+- [Mark Stefik. Roots and Requirements for Collaborative AI (2023)](https://arxiv.org/ftp/arxiv/papers/2303/2303.12040.pdf)
+- [Jason Lee. Teaching a computer how to play Snake with Q-Learning (2020)](https://towardsdatascience.com/teaching-a-computer-how-to-play-snake-with-q-learning-93d0a316ddc0)
+- [Alex Maszański. Reinforcement Learning explained with simple examples (2021)](https://proglib.io/p/chto-takoe-obuchenie-s-podkrepleniem-i-kak-ono-rabotaet-obyasnyaem-na-prostyh-primerah)
+- [Adrià Garriga-Alonso. The Malmo Collaborative AI Challenge (2017)](https://github.com/rhaps0dy/malmo-challenge)
+- [Florin Gogianu. Malmo Challenge Overview (2017)](https://github.com/village-people/flying-pig)
+- [James Allen, George Ferguson. Human-machine collaborative planning (2020)](https://www.researchgate.net/publication/228911168_Human-machine_collaborative_planning)
+- [Johnson M., Hofmann K., Hutton T., Bignell D. The Malmo Platform for AI Experimentation (2016)](https://github.com/Microsoft/malmo)
+- [Gary Klein, David D. Woods, Jeffrey M. Bradshaw, Robert R. Hoffman, Paul J. Feltovich. Ten Challenges for Making Automation a “Team Player” in Joint Human-Agent Activity (2004)](https://www.ihmc.us/wp-content/uploads/2021/04/17.-Team-Players.pdf)
+- [Wikipedia: Intelligent Agent](https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D1%82%D0%B5%D0%BB%D0%BB%D0%B5%D0%BA%D1%82%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D0%B0%D0%B3%D0%B5%D0%BD%D1%82)
+- [Wikipedia: Temporal Logic](https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D0%BC%D0%BF%D0%BE%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0)
+- [Wikipedia: Q-learning](https://en.wikipedia.org/wiki/Q-learning)
+- [Wikipedia: Deep Learning](https://ru.wikipedia.org/wiki/%D0%93%D0%BB%D1%83%D0%B1%D0%BE%D0%BA%D0%BE%D0%B5_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5)
+- [Wikipedia: Tkinter](https://ru.wikipedia.org/wiki/Tkinter)
+
+For further details, see the [Thesis.pdf](Thesis.pdf) file. Please note that the document was machine translated, and the accuracy of the translation has not been fully verified. Original thesis can be found in [VKR.pdf](VKR.pdf)
