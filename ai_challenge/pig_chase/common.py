@@ -18,10 +18,11 @@
 ENV_AGENT_NAMES = ['Agent_1', 'Agent_2']
 ENV_TARGET_NAMES = ['Pig']
 ENV_ENTITIES_NAME = ENV_AGENT_NAMES + ENV_TARGET_NAMES
-ENV_ACTIONS = ["move 1", "turn -1", "turn 1"]
+# UP (0), RIGHT (1), DOWN (2), LEFT (3)
+ENV_ACTIONS = ["movenorth", "moveeast", "movesouth", "movewest", "use 1"]
 ENV_ENTITIES = 'entities'
 ENV_BOARD = 'board'
-ENV_BOARD_SHAPE = (9, 9)
+ENV_BOARD_SHAPE = (12, 12)
 ENV_INDIVIDUAL_REWARD = 5
 ENV_CAUGHT_REWARD = 25
 class ENV_AGENT_TYPES:

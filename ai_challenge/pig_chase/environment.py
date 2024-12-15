@@ -28,6 +28,8 @@ from common import Entity, ENV_ACTIONS, ENV_BOARD, ENV_ENTITIES, \
 from MalmoPython import MissionSpec
 from malmopy.environment.malmo import MalmoEnvironment, MalmoStateBuilder
 
+from random import random
+
 
 class PigChaseSymbolicStateBuilder(MalmoStateBuilder):
     """
@@ -59,7 +61,7 @@ class PigChaseSymbolicStateBuilder(MalmoStateBuilder):
 
         if self._entities_override:
             for entity in entities:
-                board[int(entity['z'] + 1), int(entity['x'])] += '/' + entity[
+                board[int(entity['z'] - 1), int(entity['x'] - 1)] += '/' + entity[
                     'name']
 
         return (board, entities)
@@ -158,11 +160,16 @@ class PigChaseEnvironment(MalmoEnvironment):
     """
 
     VALID_START_POSITIONS = [
-        (2.5,1.5), (3.5,1.5), (4.5,1.5), (5.5,1.5), (6.5,1.5),
-        (2.5,2.5),            (4.5,2.5),            (6.5,2.5),
-                   (3.5,3.5), (4.5,3.5), (5.5,3.5),
-        (2.5,4.5),            (4.5,4.5),            (6.5,4.5),
-        (2.5,5.5), (3.5,5.5), (4.5,5.5), (5.5,5.5), (6.5,5.5)
+        (1.5,1.5), (2.5,1.5), (3.5,1.5), (4.5,1.5), (5.5,1.5), (6.5,1.5), (7.5,1.5), (8.5,1.5), (9.5,1.5),            
+        (1.5,2.5), (2.5,2.5),            (4.5,2.5), (5.5,2.5),            (7.5,2.5),            (9.5,2.5), (10.5,2.5),
+        (1.5,3.5),            (3.5,3.5), (4.5,3.5),            (6.5,3.5), (7.5,3.5), (8.5,3.5),            (10.5,3.5),
+        (1.5,4.5),            (3.5,4.5),            (5.5,4.5), (6.5,4.5),            (8.5,4.5), (9.5,4.5), (10.5,4.5),
+        (1.5,5.5), (2.5,5.5), (3.5,5.5), (4.5,5.5), (5.5,5.5), (6.5,5.5),                       (9.5,5.5), (10.5,5.5),
+        (1.5,6.5),            (3.5,6.5), (4.5,6.5),            (6.5,6.5), (7.5,6.5), (8.5,6.5),            (10.5,6.5),
+        (1.5,7.5), (2.5,7.5), (3.5,7.5), (4.5,7.5),            (6.5,7.5), (7.5,7.5), (8.5,7.5), (9.5,7.5), (10.5,7.5),
+        (1.5,8.5),                                             (6.5,8.5), (7.5,8.5),            (9.5,8.5), (10.5,8.5),
+        (1.5,9.5),            (3.5,9.5),            (5.5,9.5), (6.5,9.5),                                  (10.5,9.5),
+        (1.5,10.5), (2.5,10.5), (3.5,10.5), (4.5,10.5), (5.5,10.5), (6.5,10.5), (7.5,10.5), (8.5,10.5), (9.5,10.5), (10.5,10.5),
         ]
     VALID_YAW = [0, 90, 180, 270]
 
@@ -182,7 +189,9 @@ class PigChaseEnvironment(MalmoEnvironment):
                                        '<MsPerTick>50</MsPerTick>',
                                        self._mission_xml)
         super(PigChaseEnvironment, self).__init__(self._mission_xml, actions,
-                                                  remotes, role, exp_name, True)
+                                                  remotes, role, exp_name, False)
+        
+        self._mission.allowAllDiscreteMovementCommands()
 
         self._internal_symbolic_builder = PigChaseSymbolicStateBuilder()
         self._user_defined_builder = state_builder
@@ -236,18 +245,16 @@ class PigChaseEnvironment(MalmoEnvironment):
             xml = re.sub(r'<DrawEntity[^>]+>',
                          r'<DrawEntity x="%g" y="4" z="%g" type="Pig"/>' % pos[
                              0], xml)
-            xml = re.sub(
-                r'(<Name>%s</Name>\s*<AgentStart>\s*)<Placement[^>]+>' %
-                ENV_AGENT_NAMES[0],
-                r'\1<Placement x="%g" y="4" z="%g" pitch="30" yaw="%g"/>' %
-                (pos[1][0], pos[1][1],
-                 np.random.choice(PigChaseEnvironment.VALID_YAW)), xml)
-            xml = re.sub(
-                r'(<Name>%s</Name>\s*<AgentStart>\s*)<Placement[^>]+>' %
-                ENV_AGENT_NAMES[1],
-                r'\1<Placement x="%g" y="4" z="%g" pitch="30" yaw="%g"/>' %
-                (pos[2][0], pos[2][1],
-                 np.random.choice(PigChaseEnvironment.VALID_YAW)), xml)
+            #xml = re.sub(
+            #    r'(<Name>%s</Name>\s*<AgentStart>\s*)<Placement[^>]+>' %
+            #    ENV_AGENT_NAMES[0],
+            #    r'\1<Placement x="%g" y="4" z="%g" pitch="90" yaw="180"/>' %
+            #    (pos[1][0], pos[1][1]), xml)
+            #xml = re.sub(
+            #    r'(<Name>%s</Name>\s*<AgentStart>\s*)<Placement[^>]+>' %
+            #    ENV_AGENT_NAMES[1],
+            #    r'\1<Placement x="%g" y="4" z="%g" pitch="90" yaw="180"/>' %
+            #    (pos[2][0], pos[2][1]), xml)
 
         return MissionSpec(xml, True)
 
@@ -284,7 +291,6 @@ class PigChaseEnvironment(MalmoEnvironment):
         obs = json.loads(world_state.observations[-1].text)
         if not (ENV_ENTITIES in obs) or not (ENV_BOARD in obs):
             return False
-
         # Check agent entities are correctly positioned:
         entities = obs[ENV_ENTITIES]
         for ent in entities:

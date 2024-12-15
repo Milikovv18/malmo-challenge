@@ -22,14 +22,13 @@ import time
 import pickle
 from collections import namedtuple
 from tkinter import ttk, Canvas, W
+from random import random
 
 import numpy as np
 from common import visualize_training, Entity, ENV_TARGET_NAMES, ENV_ENTITIES, ENV_AGENT_NAMES, \
     ENV_ACTIONS, ENV_CAUGHT_REWARD, ENV_BOARD_SHAPE, ENV_AGENT_TYPES
-from six.moves import range
 
-from malmopy.agent import AStarAgent
-from malmopy.agent import QLearnerAgent, BaseAgent, RandomAgent
+from malmopy.agent import AStarAgent, QLearnerAgent, BaseAgent, RandomAgent
 from malmopy.agent.gui import GuiAgent
 
 P_FOCUSED = .75
@@ -189,7 +188,7 @@ class FocusedAgent(AStarAgent):
         me_details = [e for e in entities if e['name'] == self.name][0]
         yaw = int(me_details['yaw'])
         direction = ((((yaw - 45) % 360) // 90) - 1) % 4  # convert Minecraft yaw to 0=north, 1=east etc.
-        target = [(j, i) for i, v in enumerate(state) for j, k in enumerate(v) if self._target in k]
+        target = [(j+1, i+1) for i, v in enumerate(state) for j, k in enumerate(v) if self._target in k]
 
         # Get agent and target nodes
         me = FocusedAgent.Neighbour(1, me[0][0], me[0][1], direction, "")
@@ -207,6 +206,7 @@ class FocusedAgent(AStarAgent):
             self._action_list = []
             for point in path:
                 self._action_list.append(point.action)
+            print(self._action_list)
 
         if self._action_list is not None and len(self._action_list) > 0:
             action = self._action_list.pop(0)
